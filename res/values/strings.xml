@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">pomidor</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="clock">200</string>
+</resources>
