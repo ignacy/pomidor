@@ -13,6 +13,7 @@ public class pomidor extends Activity implements OnClickListener
 {
     private Handler handler;
     private TextView textView;
+    private TextView pomodoros;
     private int mStartTime;
 
     @Override
@@ -30,6 +31,7 @@ public class pomidor extends Activity implements OnClickListener
         stopButton.setOnClickListener(this);
 
         textView = (TextView) findViewById(R.id.timer_label);
+        pomodoros = (TextView) findViewById(R.id.pomodoros_count);
     }
 
 
@@ -50,9 +52,15 @@ public class pomidor extends Activity implements OnClickListener
                 int minutes = mStartTime / 60;
                 int seconds = mStartTime % 60;
 
-                textView.setText(minutes + ":" + seconds);
-                if (mStartTime > 1) {
+                String separator = (seconds < 10) ? ": 0" : ":";
+
+                textView.setText(minutes + separator + seconds);
+                if (mStartTime >= 1) {
                     handler.postDelayed(mUpdateTimeTask, 1000);
+                } else {
+                    textView.setText("25:00");
+                    int current = new Integer(pomodoros.getText().toString()).intValue();
+                    pomodoros.setText(Integer.toString(current));
                 }
             }
         };

@@ -3,5 +3,7 @@
     <string name="app_name">pomidor</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
-    <string name="clock">200</string>
+    <string name="clock">25:00</string>
+    <string name="count_label">Pomodoros finished:</string>
+    <string name="count">0</string>
 </resources>
