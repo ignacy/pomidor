@@ -8,9 +8,13 @@ import android.widget.TextView;
 import android.view.View.OnClickListener;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 
-public class pomidor extends Activity implements OnClickListener
+public class Pomidor extends Activity implements OnClickListener
 {
+    private static int donePomodoros = 0;
+
     private Handler handler;
     private TextView textView;
     private TextView pomodoros;
@@ -23,7 +27,8 @@ public class pomidor extends Activity implements OnClickListener
         setContentView(R.layout.main);
 
         handler = new Handler();
-        mStartTime = 1500;
+        //mStartTime = 1500;
+        mStartTime = 63;
 
         View startButton = findViewById(R.id.start_button);
         startButton.setOnClickListener(this);
@@ -59,9 +64,18 @@ public class pomidor extends Activity implements OnClickListener
                     handler.postDelayed(mUpdateTimeTask, 1000);
                 } else {
                     textView.setText("25:00");
-                    int current = new Integer(pomodoros.getText().toString()).intValue();
-                    pomodoros.setText(Integer.toString(current));
+                    donePomodoros++;
+
+                    // Save the current value
+                    getPreferences(MODE_PRIVATE).edit().putInt("pomodorod_done", donePomodoros).commit();
+
+                    pomodoros.setText(Integer.toString(Pomidor.getDonePomodoros(getContext())));
                 }
             }
         };
+
+    public static int getDonePomodorosCount(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+            .getInt("pomodorosDone", donePomodoros);
+    }
 }
