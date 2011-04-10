@@ -13,25 +13,40 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
+
+import android.widget.LinearLayout;
+
 public class Pomidor extends Activity implements OnClickListener
 {
-    private static int donePomodoros = 0;
-    private static final int INTERVAL = 62;
+    private static int donePomodoros;
+    private static final int INTERVAL = 1500;
 
     private Handler handler;
     private TextView textView;
     private TextView pomodoros;
     private int mStartTime;
 
+    private AdView adView;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        adView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest();
+        adView.loadAd(adRequest);
+
+        donePomodoros = getDonePomodorosCount();
+
         try {
             handler = new Handler();
-            //mStartTime = 1500;
             mStartTime = INTERVAL;
 
             View startButton = findViewById(R.id.start_button);
@@ -39,18 +54,20 @@ public class Pomidor extends Activity implements OnClickListener
             View stopButton = findViewById(R.id.stop_button);
             stopButton.setOnClickListener(this);
 
+
             textView = (TextView) findViewById(R.id.timer_label);
+            textView.setText(getTimeString(INTERVAL));
+
             pomodoros = (TextView) findViewById(R.id.pomodoros_count);
+            pomodoros.setText(Integer.toString(getDonePomodorosCount()));
 
         } catch (Exception ex) {
             Log.e("onCreate", ex.getMessage());
         }
-
     }
 
 
     public void onClick(View v) {
-
         try {
             switch (v.getId()) {
             case R.id.start_button:
@@ -68,30 +85,34 @@ public class Pomidor extends Activity implements OnClickListener
     private Runnable mUpdateTimeTask = new Runnable() {
             public void run() {
                 mStartTime--;
-                int minutes = mStartTime / 60;
-                int seconds = mStartTime % 60;
-
-                String separator = (seconds < 10) ? ": 0" : ":";
-
-                textView.setText(minutes + separator + seconds);
+                textView.setText(getTimeString(mStartTime));
                 if (mStartTime >= 1) {
                     handler.postDelayed(mUpdateTimeTask, 1000);
                 } else {
-                    textView.setText(Integer.toString(INTERVAL));
+                    textView.setText(getTimeString(INTERVAL));
                     donePomodoros++;
-
                     // Save the current value
                     getPreferences(MODE_PRIVATE).edit().putInt("pomodorod_done", donePomodoros).commit();
-                    mStartTime = INTERVAL;
+                    mStartTime = INTERVAL; //reset timer
                     pomodoros.setText(Integer.toString(getDonePomodorosCount()));
                 }
             }
         };
 
     public int getDonePomodorosCount() {
-        int curr = PreferenceManager.getDefaultSharedPreferences(this)
+        return PreferenceManager.getDefaultSharedPreferences(this)
             .getInt("pomodorosDone", donePomodoros);
-        Log.i("ccc", "Current count is : " + curr);
-        return curr;
+    }
+
+    private String getTimeString(int time) {
+        int minutes = time / 60;
+        int seconds = time % 60;
+        final String separator = (seconds < 10) ? ":0" : ":";
+        return minutes + separator + seconds;
+    }
+
+    public void onDestroy() {
+        adView.stopLoading();
+        super.onDestroy();
     }
 }
